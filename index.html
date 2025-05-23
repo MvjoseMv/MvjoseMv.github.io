@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Casa del Arte - Mesas de Arquitectura</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(180deg, #f3f4f6, #e5e7eb);
+      overflow-x: hidden;
+    }
+    .gradient-header {
+      background: linear-gradient(45deg, #4f46e5, #7c3aed, #db2777, #f59e0b);
+      background-size: 300% 300%;
+      animation: gradientShift 10s ease infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .card {
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+    .card img {
+      background-color: #f3f4f6; /* Fondo para imágenes con object-contain */
+    }
+    .modal, .contact-form {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .carousel-item {
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .carousel-item.hidden {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    .carousel-item.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .carousel-item img {
+      background-color: #f3f4f6; /* Fondo para imágenes del carrusel */
+    }
+    .parallax {
+      background-attachment: fixed;
+      background-size: contain; /* Ajusta la imagen del banner para mostrarla completa */
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #f3f4f6; /* Fondo para áreas vacías del banner */
+    }
+    .whatsapp-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+    .whatsapp-btn:hover {
+      transform: scale(1.1);
+    }
+    .menu-hamburguesa {
+      display: none;
+    }
+    @media (max-width: 640px) {
+      .menu-hamburguesa {
+        display: block;
+      }
+      .nav-links {
+        display: none;
+      }
+      .nav-links.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: #4f46e5;
+        padding: 1rem;
+      }
+      .nav-links.active a {
+        padding: 0.5rem;
+        text-align: center;
+      }
+      .carousel-item img {
+        height: 250px;
+      }
+      .modal, .contact-form {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+<body class="opacity-0 transition-opacity duration-1000" onload="document.body.classList.add('opacity-100')">
+  <!-- Encabezado -->
+  <header class="gradient-header text-white py-10">
+    <div class="container mx-auto text-center px-4">
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight">La Casa del Arte</h1>
+      <p class="mt-4 text-lg md:text-xl">Crea con estilo, diseña con pasión</p>
+    </div>
+  </header>
+
+  <!-- Navegación -->
+  <nav class="bg-indigo-800 py-4 sticky top-0 z-20 shadow-md">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <button class="menu-hamburguesa text-white text-2xl md:hidden" id="menu-toggle"><i class="fas fa-bars"></i></button>
+      <div class="nav-links flex space-x-8 md:flex md:space-x-8">
+        <a href="#carousel" class="text-white hover:text-indigo-200 transition-colors"><i class="fas fa-home mr-2"></i>Inicio</a>
+        <a href="#productos" class="text-white hover:text-indigo-200 transition-colors"><i class="fas fa-table mr-2"></i>Productos</a>
+        <a href="#testimonios" class="text-white hover:text-indigo-200 transition-colors"><i class="fas fa-star mr-2"></i>Testimonios</a>
+        <a href="#contacto" class="text-white hover:text-indigo-200 transition-colors"><i class="fas fa-envelope mr-2"></i>Contacto</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Carrusel -->
+  <section id="carousel" class="py-12 bg-gray-100">
+    <div class="container mx-auto px-4">
+      <div class="relative h-80 md:h-96 overflow-hidden rounded-lg parallax" id="parallax-banner">
+        <div id="carousel-items" class="absolute inset-0"></div>
+        <button id="carousel-prev" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 p-2 rounded-full hover:bg-opacity-75"><i class="fas fa-chevron-left"></i></button>
+        <button id="carousel-next" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 p-2 rounded-full hover:bg-opacity-75"><i class="fas fa-chevron-right"></i></button>
+        <div id="carousel-dots" class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filtros -->
+  <section class="py-8 bg-white">
+    <div class="container mx-auto px-4 text-center">
+      <h3 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-6">Filtrar Mesas</h3>
+      <div class="flex flex-wrap justify-center gap-4">
+        <button class="filter-btn bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors text-sm md:text-base" data-filter="all">Todas</button>
+        <button class="filter-btn bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors text-sm md:text-base" data-filter="low">Menos de S/950</button>
+        <button class="filter-btn bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors text-sm md:text-base" data-filter="medium">S/950 - S/1050</button>
+        <button class="filter-btn bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors text-sm md:text-base" data-filter="high">Más de S/1050</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Productos -->
+  <section id="productos" class="py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl md:text-4xl font-semibold text-center text-gray-800 mb-12">Nuestras Mesas de Arquitectura</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8" id="mesas-container"></div>
+    </div>
+  </section>
+
+  <!-- Sección de Testimonios -->
+  <section id="testimonios" class="py-16 bg-gray-100">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl md:text-4xl font-semibold text-center text-gray-800 mb-12">Lo que dicen nuestros clientes</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <p class="text-gray-600 italic">"La Mesa Moderna transformó mi espacio de trabajo. ¡Es elegante y funcional!"</p>
+          <p class="mt-4 font-semibold text-indigo-600">Ana G., Arquitecta</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <p class="text-gray-600 italic">"La Mesa Profesional es perfecta para mis proyectos. ¡Gran calidad!"</p>
+          <p class="mt-4 font-semibold text-indigo-600">Carlos M., Diseñador</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal de Detalles -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 md:p-8 max-w-lg w-full modal">
+      <h2 id="modal-nombre" class="text-2xl md:text-3xl font-bold text-gray-800 mb-4"></h2>
+      <div class="relative">
+        <img id="modal-imagen" class="w-full h-48 md:h-64 object-contain rounded-lg mb-4 bg-gray-100" alt="Mesa" onerror="console.error('Error loading modal image:', this.src); this.src='https://picsum.photos/300/200';">
+        <div id="modal-galeria" class="flex space-x-2 overflow-x-auto mb-4"></div>
+      </div>
+      <p id="modal-descripcion" class="text-gray-600 mb-4 text-sm md:text-base"></p>
+      <p id="modal-precio" class="text-indigo-600 font-semibold mb-6 text-lg md:text-xl"></p>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <button id="cerrar-modal" class="bg-gray-500 text-white px-4 py-2 rounded-full hover:bg-gray-600 transition-colors text-sm md:text-base">
+          Cerrar
+        </button>
+        <button id="contactar-compra" class="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors text-sm md:text-base">
+          Contactar para Comprar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de Contacto -->
+  <div id="contact-form" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 md:p-8 max-w-md w-full contact-form">
+      <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Contactar para Comprar</h2>
+      <div class="space-y-4">
+        <input type="text" id="contact-nombre" placeholder="Nombre" class="w-full p-3 border rounded-lg text-sm md:text-base">
+        <input type="email" id="contact-email" placeholder="Correo" class="w-full p-3 border rounded-lg text-sm md:text-base">
+        <textarea id="contact-mensaje" placeholder="Mensaje" class="w-full p-3 border rounded-lg h-32 text-sm md:text-base"></textarea>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button id="cerrar-contacto" class="bg-gray-500 text-white px-4 py-2 rounded-full hover:bg-gray-600 transition-colors text-sm md:text-base">
+            Cerrar
+          </button>
+          <button id="enviar-contacto" class="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors text-sm md:text-base">
+            Enviar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón de WhatsApp -->
+  <a href="https://wa.me/+51956905759" target="_blank" class="whatsapp-btn bg-green-500 text-white p-4 rounded-full shadow-lg">
+    <i class="fab fa-whatsapp text-2xl"></i>
+  </a>
+
+  <!-- Pie de página -->
+  <footer id="contacto" class="gradient-header text-white py-10">
+    <div class="container mx-auto px-4 text-center">
+      <p class="text-lg md:text-xl">Contáctanos: <a href="mailto:casadelarte392@gmail.com" class="underline">casadelarte392@gmail.com</a> | +51 956 905 759</p>
+      <p class="mt-2">© 2025 La Casa del Arte. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    const mesas = [
+      {
+        id: 1,
+        nombre: "Mesa reclinable de melamine",
+        descripcion: "Mesa de arquitectura clásica con superficie de madera pulida, ajustable en altura y ángulo. Ideal para dibujos técnicos y bocetos detallados.",
+        precio: 900.00,
+        imagen: "imagenes/Mesa melamine.jpg",
+        galeria: [
+          "imagenes/Mesa melamine.jpg",
+          "imagenes/Mesa melamine 2.jpeg",
+          "imagenes/Mesa melamine 3.jpeg"
+        ]
+      },
+      {
+        id: 2,
+        nombre: "Mesa reclinable de vidrio templado",
+        descripcion: "Diseño contemporáneo con estructura metálica y tablero de vidrio templado. Perfecta para estudios modernos y espacios minimalistas.",
+        precio: 1100.00,
+        imagen: "imagenes/Mesa vidrio templado.jpeg",
+        galeria: [
+          "imagenes/Mesa vidrio templado.jpeg",
+          "imagenes/Mesa vidrio templado 2.jpeg",
+          "imagenes/Mesa vidrio templado 3.jpeg"
+        ]
+      },
+      {
+        id: 3,
+        nombre: "Mesa reclinable de vidrio",
+        descripcion: "Mesa robusta con espacio de almacenamiento integrado y superficie antideslizante. Diseñada para arquitectos profesionales que buscan durabilidad.",
+        precio: 980.00,
+        imagen: "imagenes/Mesa Oferta.jpg",
+        galeria: [
+          "imagenes/Mesa Oferta.jpg",
+          "imagenes/Mesa oferta 2.jpg",
+          "imagenes/Mesa Oferta 3.jpg"
+        ]
+      }
+    ];
+
+    const bannerData = [
+      { imagen: "imagenes/banner mesa futurista.png" },
+      { imagen: "imagenes/banner_ambiente1.jpg" },
+      { imagen: "imagenes/banner_ambiente2.jpg" }
+    ];
+    // Alternativa con URLs externas para probar (descomentar si las imágenes locales no funcionan):
+    /*
+    const bannerData = [
+      { imagen: "https://picsum.photos/1200/400?random=1" },
+      { imagen: "https://picsum.photos/1200/400?random=2" },
+      { imagen: "https://picsum.photos/1200/400?random=3" }
+    ];
+    */
+
+    const carouselData = [
+      { imagen: mesas[0].imagen, texto: "Mesa Clásica: Elegancia y funcionalidad para tus diseños" },
+      { imagen: mesas[1].imagen, texto: "Mesa Moderna: Estilo contemporáneo para tu estudio" },
+      { imagen: mesas[2].imagen, texto: "Mesa Profesional: Robustez para arquitectos exigentes" }
+    ];
+
+    const mesasContainer = document.getElementById('mesas-container');
+    const modal = document.getElementById('modal');
+    const modalNombre = document.getElementById('modal-nombre');
+    const modalImagen = document.getElementById('modal-imagen');
+    const modalGaleria = document.getElementById('modal-galeria');
+    const modalDescripcion = document.getElementById('modal-descripcion');
+    const modalPrecio = document.getElementById('modal-precio');
+    const cerrarModal = document.getElementById('cerrar-modal');
+    const contactarCompra = document.getElementById('contactar-compra');
+    const contactForm = document.getElementById('contact-form');
+    const cerrarContacto = document.getElementById('cerrar-contacto');
+    const enviarContacto = document.getElementById('enviar-contacto');
+    const carouselItems = document.getElementById('carousel-items');
+    const carouselPrev = document.getElementById('carousel-prev');
+    const carouselNext = document.getElementById('carousel-next');
+    const carouselDots = document.getElementById('carousel-dots');
+    const menuToggle = document.getElementById('menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    const parallaxContainer = document.getElementById('parallax-banner');
+
+    console.log("Iniciando script...");
+
+    // Menú hamburguesa
+    menuToggle.addEventListener('click', () => {
+      console.log("Toggling menú hamburguesa");
+      navLinks.classList.toggle('active');
+    });
+
+    // Carrusel
+    let currentSlide = 0;
+    function updateCarousel() {
+      console.log("Actualizando carrusel, slide actual:", currentSlide);
+      // Actualizar fondo del banner
+      const bannerImage = bannerData[currentSlide].imagen;
+      console.log(`Intentando cargar imagen de banner ${currentSlide + 1}: ${bannerImage}`);
+      
+      // Validar imagen antes de establecerla
+      const img = new Image();
+      img.src = bannerImage;
+      img.onload = () => {
+        console.log(`Imagen de banner cargada exitosamente: ${bannerImage}`);
+        parallaxContainer.style.backgroundImage = `url('${bannerImage}')`;
+      };
+      img.onerror = () => {
+        console.error(`Error al cargar imagen de banner: ${bannerImage}. Usando imagen de respaldo.`);
+        parallaxContainer.style.backgroundImage = `url('https://picsum.photos/1200/400?random=${currentSlide + 1}')`;
+      };
+
+      // Actualizar carrusel de productos
+      carouselItems.innerHTML = '';
+      carouselDots.innerHTML = '';
+      carouselData.forEach((item, index) => {
+        console.log(`Cargando imagen del carrusel ${index + 1}: ${item.imagen}`);
+        const slide = document.createElement('div');
+        slide.className = `absolute inset-0 carousel-item ${index === currentSlide ? 'visible' : 'hidden'}`;
+        slide.innerHTML = `
+          <img src="${item.imagen}" class="w-full h-full object-contain" alt="Carrusel ${index + 1}" onerror="console.error('Error loading carousel image:', this.src); this.src='https://picsum.photos/300/200';">
+          <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white p-4 md:p-6">
+            <p class="text-lg md:text-xl font-semibold">${item.texto}</p>
+          </div>
+        `;
+        carouselItems.appendChild(slide);
+
+        const dot = document.createElement('button');
+        dot.className = `w-3 h-3 rounded-full ${index === currentSlide ? 'bg-indigo-600' : 'bg-gray-400'} hover:bg-indigo-700`;
+        dot.addEventListener('click', () => {
+          currentSlide = index;
+          updateCarousel();
+        });
+        carouselDots.appendChild(dot);
+      });
+    }
+    updateCarousel();
+
+    carouselPrev.addEventListener('click', () => {
+      currentSlide = (currentSlide - 1 + bannerData.length) % bannerData.length;
+      updateCarousel();
+    });
+    carouselNext.addEventListener('click', () => {
+      currentSlide = (currentSlide + 1) % bannerData.length;
+      updateCarousel();
+    });
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % bannerData.length;
+      updateCarousel();
+    }, 5000);
+
+    // Generar tarjetas
+    function renderMesas(filteredMesas) {
+      console.log("Renderizando mesas:", filteredMesas.length);
+      mesasContainer.innerHTML = '';
+      filteredMesas.forEach((mesa, index) => {
+        console.log(`Intentando cargar imagen para ${mesa.nombre}: ${mesa.imagen}`);
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-lg overflow-hidden card';
+        card.innerHTML = `
+          <img src="${mesa.imagen}" alt="${mesa.nombre}" class="w-full h-40 md:h-56 object-contain transform hover:scale-105 transition-transform duration-300" onerror="console.error('Error loading card image:', this.src); this.src='https://picsum.photos/300/200';">
+          <div class="p-4 md:p-6">
+            <h3 class="text-lg md:text-xl font-bold text-gray-800">${mesa.nombre}</h3>
+            <p class="text-gray-600 mt-2 text-sm md:text-base">${mesa.descripcion.substring(0, 100)}...</p>
+            <p class="text-indigo-600 font-semibold mt-4 text-lg">S/${mesa.precio.toFixed(2)}</p>
+            <button class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors text-sm md:text-base" data-id="${mesa.id}">
+              Ver Detalles
+            </button>
+          </div>
+        `;
+        mesasContainer.appendChild(card);
+        setTimeout(() => card.classList.add('visible'), index * 200);
+      });
+    }
+    renderMesas(mesas);
+
+    // Filtros
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        console.log("Filtrando mesas, filtro:", btn.dataset.filter);
+        const filter = btn.dataset.filter;
+        let filteredMesas = mesas;
+        if (filter === 'low') filteredMesas = mesas.filter(m => m.precio < 950);
+        else if (filter === 'medium') filteredMesas = mesas.filter(m => m.precio >= 950 && m.precio <= 1050);
+        else if (filter === 'high') filteredMesas = mesas.filter(m => m.precio > 1050);
+        renderMesas(filteredMesas);
+      });
+    });
+
+    // Modal de detalles
+    mesasContainer.addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON') {
+        const mesaId = parseInt(e.target.dataset.id);
+        const mesa = mesas.find(m => m.id === mesaId);
+        if (mesa) {
+          console.log("Abriendo modal para:", mesa.nombre);
+          modalNombre.textContent = mesa.nombre;
+          modalImagen.src = mesa.imagen;
+          modalImagen.alt = mesa.nombre;
+          modalDescripcion.textContent = mesa.descripcion;
+          modalPrecio.textContent = `S/${mesa.precio.toFixed(2)}`;
+          modalGaleria.innerHTML = mesa.galeria.map((img, idx) => `
+            <img src="${img}" class="w-16 h-16 md:w-20 md:h-20 object-contain rounded cursor-pointer hover:opacity-80" onclick="document.getElementById('modal-imagen').src = this.src;" onerror="console.error('Error loading gallery image ${idx + 1}:', this.src); this.src='https://picsum.photos/300/200';">
+          `).join('');
+          modal.classList.remove('hidden');
+        }
+      }
+    });
+
+    // Cerrar modal
+    cerrarModal.addEventListener('click', () => modal.classList.add('hidden'));
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.add('hidden');
+    });
+
+    // Formulario de contacto
+    contactarCompra.addEventListener('click', () => {
+      modal.classList.add('hidden');
+      contactForm.classList.remove('hidden');
+    });
+    cerrarContacto.addEventListener('click', () => contactForm.classList.add('hidden'));
+    contactForm.addEventListener('click', (e) => {
+      if (e.target === contactForm) contactForm.classList.add('hidden');
+    });
+    enviarContacto.addEventListener('click', () => {
+      alert('Mensaje enviado. ¡Te contactaremos pronto!');
+      contactForm.classList.add('hidden');
+    });
+
+    console.log("Script finalizado.");
+  </script>
+</body>
+</html>
